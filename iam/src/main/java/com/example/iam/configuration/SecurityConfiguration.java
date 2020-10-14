@@ -26,6 +26,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private Environment env;
 
   @Autowired
+  private SessionRegistry sessionRegistry;
+
+  @Autowired
   public SecurityConfiguration(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
     this.userService = userService;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -46,11 +49,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
           httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         });
       
-      http.sessionManagement()
-        .maximumSessions(3) //Integer.parseInt(env.getProperty("spring.maxuser.sessions"))
-        .maxSessionsPreventsLogin(true)
-        .sessionRegistry(sessionRegistry())
-        .expiredUrl("/");
+      // http.sessionManagement()
+      //   .maximumSessions(3) //Integer.parseInt(env.getProperty("spring.maxuser.sessions"))
+      //   .maxSessionsPreventsLogin(true)
+      //   .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+      //   .expiredUrl("/")
+      //   .invalidSessionUrl("/")
+      //   .sessionRegistry(sessionRegistry());
+
+        http
+        .sessionManagement()
+            .maximumSessions(1)
+                .maxSessionsPreventsLogin(true)
+                .sessionRegistry(sessionRegistry);
   }
 
   @Autowired

@@ -29,43 +29,27 @@ public class ConcurrencyService {
     SecurityContextHolder.getContext().setAuthentication(auth);
   }
 
-  public User getCurrentUser() {
+  public Principal getCurrentPrincipal() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    Object myUser = (auth != null) ? auth.getPrincipal() : null;
+    Principal myUser = (auth != null) ? auth.getPrincipal() : null;
     if (myUser instanceof User) {
-        User user = (User) myUser;
-        return user;
+      return myUser;
     } else {
-        throw new UsernameNotFoundException("当前用户不存在！");
+      throw new UsernameNotFoundException("当前用户不存在！");
     }
   }
 
-  public List<User> getAllLoggedInUser() {
-    final List<Object> allPrincipals = sessionRegistry.getAllPrincipals();
-    System.out.println("-----------------------------------");
-    System.out.println(allPrincipals.size());
-    System.out.println("-----------------------------------");
-    List<User> users = new ArrayList<>();
-    for(final Object principal : allPrincipals) {
-        if(principal instanceof User) {
-            final User user = (User) principal;
-            users.add(user);            
-        }
-    }
-    return users;
+  public User getCurrentUser() {
+    return (User) getCurrentPrincipal();
   }
 
-  /*
-  public List<SessionInformation> getCurrentSession() {
-    getAllSessions(Object principal, boolean includeExpiredSessions) ;
-    SessionInformation.expireNow();
+  public List<SessionInformation> getUserAllSessions() {
+    Principal principal = getCurrentPrincipal();
+    final List<SessionInformation> allSessions = sessionRegistry.getAllSessions(principal, false);
+    return allSallSessions;
   }
-  */
 
-  // public void logout(HttpServletRequest request, HttpServletResponse response) {
-  //   Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-  //   if (auth != null){    
-  //     new SecurityContextLogoutHandler().logout(request, response, auth);
-  //   }
+  // public boolean expireNow(SessionInformation sessionInfo) {
+  //   return sessionInfo.expireNow();
   // }
 }

@@ -28,22 +28,23 @@ public class ConcurrencyController {
     return ResponseEntity.status(HttpStatus.OK).body("success");	
   }
 
+
+  @GetMapping(value = "/active")
+  public ResponseEntity<User> getUser() {
+    User 
+    return ResponseEntity.status(HttpStatus.OK).body();
+  }
+
   @GetMapping(value = "/concurrency")
-  public ResponseEntity<List<User>> getAllLoggedInUser() {
-    List<User> sessions = concurrencyService.getAllLoggedInUser();
+  public ResponseEntity<List<User>> getUserAllSessions() {
+    List<SessionInformation> sessions = concurrencyService.getUserAllSessions();
     return ResponseEntity.status(HttpStatus.OK).body(sessions);
   }
 
-  @GetMapping(value = "/concurrency/current")
-  public ResponseEntity<User> getCurrentUser() {
-    return ResponseEntity.status(HttpStatus.OK).body(concurrencyService.getCurrentUser());
-  }
-
-  // @PostMapping("/session/remove")
-  // public ResponseEntity<String> invalidateSession(Session session) {
-  //     //invalidate the session , this will clear the data from configured database (Mysql/redis/hazelcast)
-  //     // concurrencyService.findSessionById(session.getId()).invalidate();
-  //     return ResponseEntity.status(HttpStatus.OK).body("success");	
+  // @GetMapping(value = "/concurrency/remove")
+  // public ResponseEntity<List<User>> getUserAllSessions() {
+  //   List<SessionInformation> sessions = concurrencyService.getUserAllSessions();
+  //   return ResponseEntity.status(HttpStatus.OK).body(sessions);
   // }
- 
+
 }

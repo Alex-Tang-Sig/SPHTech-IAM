@@ -21,7 +21,7 @@ public class UserController {
     this.userService = userService;
   }
  
-  @PostMapping(value="/user")
+  @GetMapping(value="/user")
   public ResponseEntity<List<User>> findAll() {
     List<User> users = userService.findAll();
     return ResponseEntity.status(HttpStatus.OK).body(users);	
