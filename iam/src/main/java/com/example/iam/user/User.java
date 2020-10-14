@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import org.springframework.data.annotation.Transient;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -78,6 +79,19 @@ public class User implements UserDetails {
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof User)) return false;
+		User that = (User) o;
+		return username.equals(that.username) && password.equals(that.password);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(username, password);
 	}
 
 }
