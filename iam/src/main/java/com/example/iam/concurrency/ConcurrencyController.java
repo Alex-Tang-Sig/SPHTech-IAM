@@ -1,14 +1,14 @@
 package com.example.iam.concurrency;
 
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.http.HttpStatus;
-import org.springframework.session.Session;
-import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.example.iam.user.User;
 
@@ -21,30 +21,21 @@ public class ConcurrencyController {
   public ConcurrencyController(ConcurrencyService concurrencyService) {
     this.concurrencyService = concurrencyService;
   }
-	
-  @PostMapping(value = "/login")
-  public ResponseEntity<String> login(User user) {
-    concurrencyService.login(user);
+
+  @GetMapping("/session")
+  public ResponseEntity<User> getCurrentUser(HttpServletRequest httpServletRequest) {
+    return ResponseEntity.status(HttpStatus.OK).body(concurrencyService.getCurrentUser());
+  }
+
+  @GetMapping("/sessions")
+  public ResponseEntity<Object> getSessions(String username) {
+		return ResponseEntity.status(HttpStatus.OK).body(concurrencyService.getSession(username));	
+  }
+  
+  @PostMapping("/sessions/{sessionIdToDelete}")
+	public ResponseEntity<String> removeSession(String username, @PathVariable String sessionIdToDelete) {
+		concurrencyService.removeSession(username, sessionIdToDelete);
     return ResponseEntity.status(HttpStatus.OK).body("success");	
-  }
-
-
-  @GetMapping(value = "/active")
-  public ResponseEntity<User> getUser() {
-    User 
-    return ResponseEntity.status(HttpStatus.OK).body();
-  }
-
-  @GetMapping(value = "/concurrency")
-  public ResponseEntity<List<User>> getUserAllSessions() {
-    List<SessionInformation> sessions = concurrencyService.getUserAllSessions();
-    return ResponseEntity.status(HttpStatus.OK).body(sessions);
-  }
-
-  // @GetMapping(value = "/concurrency/remove")
-  // public ResponseEntity<List<User>> getUserAllSessions() {
-  //   List<SessionInformation> sessions = concurrencyService.getUserAllSessions();
-  //   return ResponseEntity.status(HttpStatus.OK).body(sessions);
-  // }
+	}
 
 }

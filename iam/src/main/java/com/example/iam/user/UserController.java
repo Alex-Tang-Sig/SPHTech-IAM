@@ -20,16 +20,16 @@ public class UserController {
   public UserController(UserService userService) {
     this.userService = userService;
   }
- 
-  @GetMapping(value="/user")
-  public ResponseEntity<List<User>> findAll() {
-    List<User> users = userService.findAll();
-    return ResponseEntity.status(HttpStatus.OK).body(users);	
-  }
 
   @PostMapping(value="/signup")
   public ResponseEntity<User> signup(HttpServletRequest request, User user) {
     User createdUser = userService.signup(user);
     return ResponseEntity.status(HttpStatus.OK).body(createdUser);	
   }
+ 
+  @GetMapping(value="/user")
+  public ResponseEntity<List<User>> findAll() {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());	
+  }
+
 }

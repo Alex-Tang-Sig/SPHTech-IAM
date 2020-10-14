@@ -1,55 +1,43 @@
 package com.example.iam.concurrency;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import com.example.iam.user.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
+import java.util.Collection;
+import java.util.Set;
 
+import com.example.iam.user.User;
 
 @Service("concurrencyService")
 public class ConcurrencyService {
 
   @Autowired
-  @Qualifier("sessionRegistry")
-  private SessionRegistry sessionRegistry;
+	FindByIndexNameSessionRepository<? extends Session> sessions;
 
-
-  public void login(User user) {
-    Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-    SecurityContextHolder.getContext().setAuthentication(auth);
-  }
-
-  public Principal getCurrentPrincipal() {
+  public User getCurrentUser() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    Principal myUser = (auth != null) ? auth.getPrincipal() : null;
-    if (myUser instanceof User) {
-      return myUser;
+    Object principal = (auth != null) ? auth.getPrincipal() : null;
+    if (principal instanceof User) {
+      User u = (User) principal;
+      u.setPassword(null);
+      return u;
     } else {
-      throw new UsernameNotFoundException("当前用户不存在！");
+      throw new UsernameNotFoundException("No existing account");
     }
   }
 
-  public User getCurrentUser() {
-    return (User) getCurrentPrincipal();
-  }
+  public Collection<? extends Session> getSession(String username) {
+    return sessions.findByPrincipalName(username).values();
+  }  
 
-  public List<SessionInformation> getUserAllSessions() {
-    Principal principal = getCurrentPrincipal();
-    final List<SessionInformation> allSessions = sessionRegistry.getAllSessions(principal, false);
-    return allSallSessions;
+  public void removeSession(String username, String sessionIdToDelete) {
+    Set<String> usersSessionIds = sessions.findByPrincipalName(username).keySet();
+		if (usersSessionIds.contains(sessionIdToDelete)) {
+			this.sessions.deleteById(sessionIdToDelete);
+    }
   }
-
-  // public boolean expireNow(SessionInformation sessionInfo) {
-  //   return sessionInfo.expireNow();
-  // }
 }

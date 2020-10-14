@@ -3,17 +3,12 @@ package com.example.iam.configuration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.iam.user.UserService;
-import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.session.SessionRegistry;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 @Configuration
 @EnableWebSecurity
@@ -25,8 +20,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Autowired
   private Environment env;
 
-  @Autowired
-  private SessionRegistry sessionRegistry;
+  // @Autowired
+  // private SessionRegistry sessionRegistry;
 
   @Autowired
   public SecurityConfiguration(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -42,26 +37,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/signup", "/login").permitAll()
         .anyRequest().authenticated()
       .and()
+      .formLogin()
+        .loginProcessingUrl("/login") //the URL on which the clients should post the login information
+        .usernameParameter("username") //the username parameter in the queryString, default is 'username'
+        .passwordParameter("password") //the password parameter in the queryString, default is 'password'
+        .successHandler((httpServletRequest, httpServletResponse, authentication) -> {
+          httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+        })
+        .failureHandler((httpServletRequest, httpServletResponse, authentication) -> {
+          httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        })
+      .and()
       .logout()
         .logoutUrl("/logout")
         .permitAll()
         .logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
           httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         });
-      
-      // http.sessionManagement()
-      //   .maximumSessions(3) //Integer.parseInt(env.getProperty("spring.maxuser.sessions"))
-      //   .maxSessionsPreventsLogin(true)
-      //   .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-      //   .expiredUrl("/")
-      //   .invalidSessionUrl("/")
-      //   .sessionRegistry(sessionRegistry());
 
-        http
-        .sessionManagement()
-            .maximumSessions(1)
-                .maxSessionsPreventsLogin(true)
-                .sessionRegistry(sessionRegistry);
+      http
+      .sessionManagement()
+          .maximumSessions(3)
+              .maxSessionsPreventsLogin(true);
   }
 
   @Autowired
@@ -69,17 +66,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(userService)
         .passwordEncoder(bCryptPasswordEncoder);
   }
-
-  @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
-  }
-
-  @Bean
-  public ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
-    return new ServletListenerRegistrationBean<HttpSessionEventPublisher>(new HttpSessionEventPublisher());
-  }
 }
-
-
-
