@@ -1,16 +1,14 @@
-package com.example.iam.repository;
+package com.example.iam.user;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 import java.util.List;
-
-import com.example.iam.model.User;
 
 @Repository("userRepository")
 public interface UserRepository extends CrudRepository<User, Long> {
 
-  User findByFirstnameAndLastname(String firstname, String lastname);
+  Optional<User> findByUsername(String username);
   
   List<User> findAll();
-
 }
