@@ -9,14 +9,16 @@ import javax.persistence.Table;
 import org.springframework.data.annotation.Transient;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+
 
 @Entity
 @Table(name = "user")
-public class User implements UserDetails {
+public class User implements CustomUserDetails {
+
+	private static final long serialVersionUID = -5605924596779014029L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,25 +27,14 @@ public class User implements UserDetails {
 		
 	@Column(name = "username")
 	private String username;
+
+	@Column(name = "email")
+	private String email;
   
   @Column(name = "password")
 	@Transient
 	private String password;
-	
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
 
-		final SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("USER");
-		return Collections.singletonList(simpleGrantedAuthority);
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getUsername() {
-		return username;
-	}
 
 	public int getId() {
 		return id;
@@ -51,6 +42,23 @@ public class User implements UserDetails {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public void setusername(String username) {
+		this.username = username;
+	}
+
+	@Override
+	public String getUsername() {
+		return username;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getEmail() {
+		return email;
 	}
 
 	public String getPassword() {
@@ -80,4 +88,13 @@ public class User implements UserDetails {
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		final SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ROLE_USER");
+		return Collections.singletonList(simpleGrantedAuthority);
+	}
+	
 }
+
+DaoAuthenticationProvider

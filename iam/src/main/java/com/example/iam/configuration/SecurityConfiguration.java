@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.core.env.Environment;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -17,12 +16,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private final UserService userService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   
-  @Autowired
-  private Environment env;
-
-  // @Autowired
-  // private SessionRegistry sessionRegistry;
-
   @Autowired
   public SecurityConfiguration(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
     this.userService = userService;
@@ -35,30 +28,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       .csrf().disable() // for postman api test
       .authorizeRequests()
         .antMatchers("/signup", "/login").permitAll()
-        .anyRequest().authenticated()
+        .anyRequest().hasRole("ROLE_USER")
       .and()
-      .formLogin()
-        .loginProcessingUrl("/login") //the URL on which the clients should post the login information
-        .usernameParameter("username") //the username parameter in the queryString, default is 'username'
-        .passwordParameter("password") //the password parameter in the queryString, default is 'password'
-        .successHandler((httpServletRequest, httpServletResponse, authentication) -> {
-          httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-        })
-        .failureHandler((httpServletRequest, httpServletResponse, authentication) -> {
-          httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        })
+        .formLogin()
+          .loginProcessingUrl("/login") //the URL on which the clients should post the login information
+          .successHandler((httpServletRequest, httpServletResponse, authentication) -> {
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+          })
+          .failureHandler((httpServletRequest, httpServletResponse, authentication) -> {
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+          })
       .and()
-      .logout()
-        .logoutUrl("/logout")
-        .permitAll()
-        .logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
-          httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-        });
-
-      http
-      .sessionManagement()
-          .maximumSessions(3)
-              .maxSessionsPreventsLogin(true);
+        .logout()
+          .logoutUrl("/logout")
+          .permitAll()
+          .logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+          });
   }
 
   @Autowired

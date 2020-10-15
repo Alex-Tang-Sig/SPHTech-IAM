@@ -14,7 +14,6 @@ class App extends Component {
       loggedIn: false,
       visible: false,
     }
-    // this._updateLoginStatus();
   }
 
   componentDidMount() {

@@ -1,15 +1,13 @@
 package com.example.iam.user;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
-import javax.servlet.ServletException;
 import java.util.List;
-
 
 @RestController
 public class UserController {
@@ -22,7 +20,7 @@ public class UserController {
   }
 
   @PostMapping(value="/signup")
-  public ResponseEntity<User> signup(HttpServletRequest request, User user) {
+  public ResponseEntity<User> signup(User user) {
     User createdUser = userService.signup(user);
     return ResponseEntity.status(HttpStatus.OK).body(createdUser);	
   }
@@ -31,5 +29,8 @@ public class UserController {
   public ResponseEntity<List<User>> findAll() {
     return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());	
   }
+
+
+  
 
 }
