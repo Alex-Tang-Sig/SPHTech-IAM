@@ -22,7 +22,7 @@ public class EmailPasswordAuthenticationFilter extends AbstractAuthenticationPro
 
  
   public EmailPasswordAuthenticationFilter() {
-		super(new AntPathRequestMatcher("/emailLogin", "POST"));
+		super(new AntPathRequestMatcher("/emaillogin", "POST"));
 	}
 
 	public Authentication attemptAuthentication(HttpServletRequest request,

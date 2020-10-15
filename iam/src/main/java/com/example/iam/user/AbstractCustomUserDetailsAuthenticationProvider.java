@@ -122,6 +122,9 @@ public abstract class AbstractCustomUserDetailsAuthenticationProvider
 		if (forcePrincipalAsString) {
 			principalToReturn = user.getEmail();
 		}
+		System.out.println("**************3*****************");
+		System.out.println(user.getEmail());
+		System.out.println("**************3*****************");
 
 		return createSuccessAuthentication(principalToReturn, authentication, user);
 	}
@@ -153,7 +156,9 @@ public abstract class AbstractCustomUserDetailsAuthenticationProvider
 				principal, authentication.getCredentials(),
 				authoritiesMapper.mapAuthorities(user.getAuthorities()));
 		result.setDetails(authentication.getDetails());
-
+		System.out.println("**************4*****************");
+		System.out.println(result.getPrincipal().toString());
+		System.out.println("**************4*****************");
 		return result;
 	}
 

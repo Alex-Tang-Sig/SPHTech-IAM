@@ -49,7 +49,6 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
 	// ~ Methods
 	// ========================================================================================================
 
-	@SuppressWarnings("deprecation")
 	protected void additionalAuthenticationChecks(CustomUserDetails userDetails,
     EmailPasswordAuthenticationToken authentication)
 			throws AuthenticationException {
@@ -79,9 +78,12 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
 	protected final CustomUserDetails retrieveUser(String email,
     EmailPasswordAuthenticationToken authentication)
 			throws AuthenticationException {
-		prepareTimingAttackProtection();
+    prepareTimingAttackProtection();
 		try {
-			CustomUserDetails loadedUser = this.getUserDetailsService().loadUserByEmail(email);
+      CustomUserDetails loadedUser = this.getUserDetailsService().loadUserByEmail(email);
+      System.out.println("**************2*****************");
+      System.out.println(loadedUser.getEmail());
+      System.out.println("**************2*****************");
 			if (loadedUser == null) {
 				throw new InternalAuthenticationServiceException(
 						"CustomUserDetailsService returned null, which is an interface contract violation");

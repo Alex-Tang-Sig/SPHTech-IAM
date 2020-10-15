@@ -8,6 +8,7 @@ import com.example.iam.user.UserService;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import com.example.iam.user.CustomDaoAuthenticationProvider;
+import com.example.iam.user.CustomUserDetailsService;
 import com.example.iam.user.EmailPasswordAuthenticationFilter;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,12 +36,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth
-      .userDetailsService(userService)
-      .passwordEncoder(bCryptPasswordEncoder);
-
-    auth
-      .authenticationProvider(daoAuthenticationProvider())
-      .authenticationProvider(customDaoAuthenticationProvider());
+      .authenticationProvider(daoAuthenticationProvider());
+      // .authenticationProvider(customDaoAuthenticationProvider());
   }
 
   @Override
@@ -48,8 +45,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       http
       .csrf().disable() // for postman api test
       .authorizeRequests()
-        .antMatchers("/signup", "/login", "/emailLogin").permitAll()
-        .anyRequest().hasRole("ROLE_USER")
+        .antMatchers("/signup", "/login", "/emaillogin", "/user").permitAll()
+        .anyRequest().authenticated()
+      .and()
+        .formLogin()
       .and()
         .logout()
           .logoutUrl("/logout")
@@ -58,7 +57,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             httpServletResponse.setStatus(HttpServletResponse.SC_OK);
           });
       
-      http.addFilterBefore(emailPasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+      // http.addFilterBefore(emailPasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
   }
 
   @Override
@@ -69,12 +68,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Bean
   public DaoAuthenticationProvider daoAuthenticationProvider() {
-      return new DaoAuthenticationProvider();
+      DaoAuthenticationProvider daoAuthenticationProvider= new DaoAuthenticationProvider();
+      daoAuthenticationProvider.setUserDetailsService(userService);
+      daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
+      return daoAuthenticationProvider;
   }
 
   @Bean
   public CustomDaoAuthenticationProvider customDaoAuthenticationProvider() {
-      return new CustomDaoAuthenticationProvider();
+    CustomDaoAuthenticationProvider customDaoAuthenticationProvider = new CustomDaoAuthenticationProvider();
+    customDaoAuthenticationProvider.setUserDetailsService(userService);
+    customDaoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
+    return customDaoAuthenticationProvider;
   }
 
   @Bean 
