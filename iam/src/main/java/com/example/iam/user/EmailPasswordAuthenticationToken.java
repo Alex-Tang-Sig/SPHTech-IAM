@@ -10,6 +10,7 @@ package com.example.iam.user;
 import java.security.Principal;
 import java.util.Collection;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -18,7 +19,7 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 
 public class EmailPasswordAuthenticationToken extends AbstractAuthenticationToken {
 
-  private static final long serialVersionUID = 4305403417316811853L;
+	private static final long serialVersionUID = 4305403417316811853L;
 
   private final Object principal;
 	private Object credentials;
@@ -58,8 +59,8 @@ public class EmailPasswordAuthenticationToken extends AbstractAuthenticationToke
   
   @Override
   public String getName() {
-    if (this.getPrincipal() instanceof CustomUserDetails) {
-			return ((CustomUserDetails) this.getPrincipal()).getEmail();
+		if (this.getPrincipal() instanceof CustomUserDetails) {
+			return ((CustomUserDetails) this.getPrincipal()).getUsername();
 		}
 		if (this.getPrincipal() instanceof UserDetails) {
 			return ((UserDetails) this.getPrincipal()).getUsername();
@@ -70,7 +71,6 @@ public class EmailPasswordAuthenticationToken extends AbstractAuthenticationToke
 		if (this.getPrincipal() instanceof Principal) {
 			return ((Principal) this.getPrincipal()).getName();
 		}
-
 		return (this.getPrincipal() == null) ? "" : this.getPrincipal().toString();
 	}
 

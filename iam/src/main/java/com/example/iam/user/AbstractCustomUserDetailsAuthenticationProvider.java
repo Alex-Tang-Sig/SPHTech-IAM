@@ -61,10 +61,9 @@ public abstract class AbstractCustomUserDetailsAuthenticationProvider
 						"AbstractCustomUserDetailsAuthenticationProvider.onlySupports",
 						"Only EmailPasswordAuthenticationToken is supported"));
 
-		// Determine username
+		
 		String email = (authentication.getPrincipal() == null) ? "NONE_PROVIDED"
 				: authentication.getName();
-
 		boolean cacheWasUsed = true;
 		CustomUserDetails user = (CustomUserDetails) this.userCache.getUserFromCache(email);
 
@@ -122,9 +121,6 @@ public abstract class AbstractCustomUserDetailsAuthenticationProvider
 		if (forcePrincipalAsString) {
 			principalToReturn = user.getEmail();
 		}
-		System.out.println("**************3*****************");
-		System.out.println(user.getEmail());
-		System.out.println("**************3*****************");
 
 		return createSuccessAuthentication(principalToReturn, authentication, user);
 	}
@@ -156,9 +152,6 @@ public abstract class AbstractCustomUserDetailsAuthenticationProvider
 				principal, authentication.getCredentials(),
 				authoritiesMapper.mapAuthorities(user.getAuthorities()));
 		result.setDetails(authentication.getDetails());
-		System.out.println("**************4*****************");
-		System.out.println(result.getPrincipal().toString());
-		System.out.println("**************4*****************");
 		return result;
 	}
 

@@ -1,6 +1,7 @@
 package com.example.iam.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor.OptimalPropertyAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,23 +23,13 @@ public class UserService implements CustomUserDetailsService { //  CustomUserDet
 
 	@Override
 	public User loadUserByUsername(String username) {
-		System.out.println("88888888888888888888888888888888888");
-		System.out.println(username);
-		System.out.println("88888888888888888888888888888888888");
 		final Optional<User> optionalUser = userRepository.findByUsername(username);
-
 		return optionalUser.orElseThrow(() -> new UsernameNotFoundException("User cannot be found."));
 	}
 
 	@Override
 	public User loadUserByEmail(String email) {
-		System.out.println("88888888888888888888888888888888888");
-		System.out.println(email);
-		System.out.println("88888888888888888888888888888888888");
 		final Optional<User> optionalUser = userRepository.findByEmail(email);
-		System.out.println("88888888888888888888888888888888888");
-		System.out.println(email);
-		System.out.println("88888888888888888888888888888888888");
 		return optionalUser.orElseThrow(() -> new EmailNotFoundException("User cannot be found."));
   }
 	

@@ -80,14 +80,13 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
 			throws AuthenticationException {
     prepareTimingAttackProtection();
 		try {
+  
       CustomUserDetails loadedUser = this.getUserDetailsService().loadUserByEmail(email);
-      System.out.println("**************2*****************");
-      System.out.println(loadedUser.getEmail());
-      System.out.println("**************2*****************");
+ 
 			if (loadedUser == null) {
 				throw new InternalAuthenticationServiceException(
 						"CustomUserDetailsService returned null, which is an interface contract violation");
-			}
+      }
 			return loadedUser;
 		}
 		catch (UsernameNotFoundException ex) {
