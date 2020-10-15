@@ -91,10 +91,8 @@ public class User implements CustomUserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		final SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ROLE_USER");
+		final SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("USER");
 		return Collections.singletonList(simpleGrantedAuthority);
 	}
 	
 }
-
-DaoAuthenticationProvider

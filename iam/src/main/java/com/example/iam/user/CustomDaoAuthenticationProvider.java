@@ -73,7 +73,7 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
 	}
 
 	protected void doAfterPropertiesSet() {
-		Assert.notNull(this.userDetailsService, "A UserDetailsService must be set");
+		Assert.notNull(this.userDetailsService, "A CustomUserDetailsService must be set");
 	}
 
 	protected final CustomUserDetails retrieveUser(String email,

@@ -29,8 +29,4 @@ public class UserController {
   public ResponseEntity<List<User>> findAll() {
     return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());	
   }
-
-
-  
-
 }

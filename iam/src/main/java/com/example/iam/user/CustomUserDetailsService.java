@@ -5,5 +5,5 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface CustomUserDetailsService extends UserDetailsService {
 	// ~ Methods
 	// ========================================================================================================
-  CustomUserDetails loadUserByEmail(String email) throws EmailNotFoundException;
+  CustomUserDetails loadUserByEmail(String email);
 }
