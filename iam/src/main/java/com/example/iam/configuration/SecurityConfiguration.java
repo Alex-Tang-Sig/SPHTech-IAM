@@ -1,7 +1,6 @@
 package com.example.iam.configuration;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -19,7 +18,9 @@ import com.example.iam.user.CustomDaoAuthenticationProvider;
 import com.example.iam.user.EmailPasswordAuthenticationFilter;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.WebAttributes;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -58,6 +59,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private AuthenticationFailureHandler authenticationFailureHandler;
 
   @Autowired
+  private AuthenticationEntryPoint authenticationEntryPoint;
+
+  @Autowired
   private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
 
   @Bean
@@ -81,12 +85,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     http.csrf().disable() // for postman api test
         .authorizeRequests().antMatchers("/signup", "/login", "/login/email", "/user").permitAll().anyRequest()
         .authenticated();
-    
-    http.logout().permitAll()
-        .invalidateHttpSession(true)
-        .deleteCookies("JSESSIONID")
+
+    http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
+
+    http.logout().permitAll().invalidateHttpSession(true).deleteCookies("JSESSIONID")
         .logoutSuccessHandler(logoutSuccessHandler());
-    
+
     http.addFilterBefore(usernamePasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
     http.addFilterBefore(emailPasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
   }
@@ -170,9 +174,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       @Override
       public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
           AuthenticationException exception) throws IOException, ServletException {
-        response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getMessage());
       }
     };
   }
 
+  @Bean
+  public AuthenticationEntryPoint authenticationEntryPoint() {
+    return new CustomAuthenticationEntryPoint();
+  }
+
+  private class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+        throws IOException, ServletException {
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+    }
+  }
 }
+

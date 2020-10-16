@@ -89,7 +89,7 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
       }
 			return loadedUser;
 		}
-		catch (UsernameNotFoundException ex) {
+		catch (EmailNotFoundException ex) {
 			mitigateAgainstTimingAttack(authentication);
 			throw ex;
 		}

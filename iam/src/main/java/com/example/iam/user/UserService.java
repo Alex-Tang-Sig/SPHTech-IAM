@@ -32,9 +32,8 @@ public class UserService implements CustomUserDetailsService { // CustomUserDeta
 	}
 
 	public Boolean signup(User user) {
-		boolean isPresent = userRepository.findByUsername(user.getUsername()).isPresent()
-				|| userRepository.findByEmail(user.getEmail()).isPresent();
-		if (isPresent) {
+		final Optional<User> optionalUser = userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail());
+		if (optionalUser.isPresent()) {
 			return false;
 		}
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));

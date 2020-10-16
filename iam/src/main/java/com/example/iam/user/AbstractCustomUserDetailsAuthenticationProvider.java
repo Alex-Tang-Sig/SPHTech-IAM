@@ -55,7 +55,7 @@ public abstract class AbstractCustomUserDetailsAuthenticationProvider
 		doAfterPropertiesSet();
 	}
 
-	public Authentication authenticate(Authentication authentication) {
+	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		Assert.isInstanceOf(EmailPasswordAuthenticationToken.class, authentication,
 				() -> messages.getMessage(
 						"AbstractCustomUserDetailsAuthenticationProvider.onlySupports",
@@ -69,12 +69,12 @@ public abstract class AbstractCustomUserDetailsAuthenticationProvider
 
 		if (user == null) {
 			cacheWasUsed = false;
-
 			try {
 				user = retrieveUser(email,
 						(EmailPasswordAuthenticationToken) authentication);
 			}
 			catch (EmailNotFoundException notFound) {
+
 				logger.debug("User '" + email + "' not found");
 
 				if (hideUserNotFoundExceptions) {
