@@ -1,22 +1,20 @@
 package com.example.iam.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.spel.support.ReflectivePropertyAccessor.OptimalPropertyAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.Optional;
 import java.util.List;
 
 @Service("userService")
-public class UserService implements CustomUserDetailsService { //  CustomUserDetailsService
+public class UserService implements CustomUserDetailsService { // CustomUserDetailsService
 
 	private UserRepository userRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
-	
-  @Autowired
-  public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) { 
+
+	@Autowired
+	public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userRepository = userRepository;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
@@ -31,13 +29,17 @@ public class UserService implements CustomUserDetailsService { //  CustomUserDet
 	public User loadUserByEmail(String email) {
 		final Optional<User> optionalUser = userRepository.findByEmail(email);
 		return optionalUser.orElseThrow(() -> new EmailNotFoundException("User cannot be found."));
-  }
-	
-	public User signup(User user) {
+	}
+
+	public Boolean signup(User user) {
+		boolean isPresent = userRepository.findByUsername(user.getUsername()).isPresent()
+				|| userRepository.findByEmail(user.getEmail()).isPresent();
+		if (isPresent) {
+			return false;
+		}
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		userRepository.save(user);
-		user.setPassword(null);
-		return user;
+		return true;
 	}
 
 	public List<User> findAll() {
@@ -45,6 +47,4 @@ public class UserService implements CustomUserDetailsService { //  CustomUserDet
 		users.forEach(user -> user.setPassword(null));
 		return users;
 	}
-
-
 }

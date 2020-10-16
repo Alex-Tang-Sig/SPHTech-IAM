@@ -16,7 +16,6 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.context.annotation.Bean;
 import com.example.iam.user.CustomDaoAuthenticationProvider;
-import com.example.iam.user.CustomUserDetailsService;
 import com.example.iam.user.EmailPasswordAuthenticationFilter;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

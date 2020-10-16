@@ -7,14 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.http.HttpStatus;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 
 @RestController
 public class UserController {
@@ -27,9 +20,9 @@ public class UserController {
   }
 
   @PostMapping(value="/signup")
-  public ResponseEntity<User> signup(User user) {
-    User createdUser = userService.signup(user);
-    return ResponseEntity.status(HttpStatus.OK).body(createdUser);	
+  public ResponseEntity<String> signup(User user) {
+    boolean saved = userService.signup(user);
+    return saved ? ResponseEntity.status(HttpStatus.CREATED).build() : ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
   
   @GetMapping(value="/user")
