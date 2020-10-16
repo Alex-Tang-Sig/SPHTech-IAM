@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.List;
 
 @Service("userService")
-public class UserService implements CustomUserDetailsService { // CustomUserDetailsService
+public class UserService implements CustomUserDetailsService { 
 
 	private UserRepository userRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;

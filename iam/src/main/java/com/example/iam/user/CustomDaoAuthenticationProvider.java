@@ -1,48 +1,43 @@
 package com.example.iam.user;
 
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.util.Assert;
 
 public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAuthenticationProvider {
-  // ~ Static fields/initializers
-  // =====================================================================================
+	// ~ Static fields/initializers
+	// =====================================================================================
 
-  /**
-   * The plaintext password used to perform PasswordEncoder#matches(CharSequence,
-   * String)} on when the user is not found to avoid SEC-2056.
-   */
-  private static final String USER_NOT_FOUND_PASSWORD = "userNotFoundPassword";
+	/**
+	 * The plaintext password used to perform PasswordEncoder#matches(CharSequence,
+	 * String)} on when the user is not found to avoid SEC-2056.
+	 */
+	private static final String USER_NOT_FOUND_PASSWORD = "userNotFoundPassword";
 
-  // ~ Instance fields
-  // ================================================================================================
+	// ~ Instance fields
+	// ================================================================================================
 
-  private PasswordEncoder passwordEncoder;
+	private PasswordEncoder passwordEncoder;
 
-  /**
-   * The password used to perform
-   * {@link PasswordEncoder#matches(CharSequence, String)} on when the user is not
-   * found to avoid SEC-2056. This is necessary, because some
-   * {@link PasswordEncoder} implementations will short circuit if the password is
-   * not in a valid format.
-   */
-  private volatile String userNotFoundEncodedPassword;
+	/**
+	 * The password used to perform
+	 * {@link PasswordEncoder#matches(CharSequence, String)} on when the user is not
+	 * found to avoid SEC-2056. This is necessary, because some
+	 * {@link PasswordEncoder} implementations will short circuit if the password is
+	 * not in a valid format.
+	 */
+	private volatile String userNotFoundEncodedPassword;
 
-  private CustomUserDetailsService userDetailsService;
+	private CustomUserDetailsService userDetailsService;
 
-  private UserDetailsPasswordService userDetailsPasswordService;
+	private UserDetailsPasswordService userDetailsPasswordService;
 
-  public CustomDaoAuthenticationProvider() {
+	public CustomDaoAuthenticationProvider() {
 		setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
 	}
 
@@ -50,14 +45,12 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
 	// ========================================================================================================
 
 	protected void additionalAuthenticationChecks(CustomUserDetails userDetails,
-    EmailPasswordAuthenticationToken authentication)
-			throws AuthenticationException {
+			EmailPasswordAuthenticationToken authentication) throws AuthenticationException {
 		if (authentication.getCredentials() == null) {
 			logger.debug("Authentication failed: no credentials provided");
 
-			throw new BadCredentialsException(messages.getMessage(
-					"AbstractUserDetailsAuthenticationProvider.badCredentials",
-					"Bad credentials"));
+			throw new BadCredentialsException(
+					messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
 		}
 
 		String presentedPassword = authentication.getCredentials().toString();
@@ -65,9 +58,8 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
 		if (!passwordEncoder.matches(presentedPassword, userDetails.getPassword())) {
 			logger.debug("Authentication failed: password does not match stored value");
 
-			throw new BadCredentialsException(messages.getMessage(
-					"AbstractCustomUserDetailsAuthenticationProvider.badCredentials",
-					"Bad credentials"));
+			throw new BadCredentialsException(
+					messages.getMessage("AbstractCustomUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
 		}
 	}
 
@@ -75,35 +67,31 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
 		Assert.notNull(this.userDetailsService, "A CustomUserDetailsService must be set");
 	}
 
-	protected final CustomUserDetails retrieveUser(String email,
-    EmailPasswordAuthenticationToken authentication)
+	protected final CustomUserDetails retrieveUser(String email, EmailPasswordAuthenticationToken authentication)
 			throws AuthenticationException {
-    prepareTimingAttackProtection();
+		prepareTimingAttackProtection();
 		try {
-  
-      CustomUserDetails loadedUser = this.getUserDetailsService().loadUserByEmail(email);
- 
+
+			CustomUserDetails loadedUser = this.getUserDetailsService().loadUserByEmail(email);
+
 			if (loadedUser == null) {
 				throw new InternalAuthenticationServiceException(
 						"CustomUserDetailsService returned null, which is an interface contract violation");
-      }
+			}
 			return loadedUser;
-		}
-		catch (EmailNotFoundException ex) {
+		} catch (EmailNotFoundException ex) {
 			mitigateAgainstTimingAttack(authentication);
 			throw ex;
-		}
-		catch (InternalAuthenticationServiceException ex) {
+		} catch (InternalAuthenticationServiceException ex) {
 			throw ex;
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			throw new InternalAuthenticationServiceException(ex.getMessage(), ex);
 		}
 	}
 
 	@Override
-	protected Authentication createSuccessAuthentication(Object principal,
-			Authentication authentication, CustomUserDetails user) {
+	protected Authentication createSuccessAuthentication(Object principal, Authentication authentication,
+			CustomUserDetails user) {
 		boolean upgradeEncoding = this.userDetailsPasswordService != null
 				&& this.passwordEncoder.upgradeEncoding(user.getPassword());
 		if (upgradeEncoding) {
@@ -145,8 +133,7 @@ public class CustomDaoAuthenticationProvider extends AbstractCustomUserDetailsAu
 		return userDetailsService;
 	}
 
-	public void setUserDetailsPasswordService(
-			UserDetailsPasswordService userDetailsPasswordService) {
+	public void setUserDetailsPasswordService(UserDetailsPasswordService userDetailsPasswordService) {
 		this.userDetailsPasswordService = userDetailsPasswordService;
 	}
 }
