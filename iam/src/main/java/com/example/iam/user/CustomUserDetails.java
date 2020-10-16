@@ -2,11 +2,8 @@ package com.example.iam.user;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
-/**
- * CustomUserDetails
- */
+/** CustomUserDetails */
 public interface CustomUserDetails extends UserDetails {
 
   String getEmail();
-  
 }

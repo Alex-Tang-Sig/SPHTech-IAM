@@ -1,16 +1,14 @@
 package com.example.iam.concurrency;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.http.HttpStatus;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.example.iam.user.User;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ConcurrencyController {
@@ -29,13 +27,13 @@ public class ConcurrencyController {
 
   @GetMapping("/sessions")
   public ResponseEntity<Object> getSessions(String username) {
-		return ResponseEntity.status(HttpStatus.OK).body(concurrencyService.getSession(username));	
+    return ResponseEntity.status(HttpStatus.OK).body(concurrencyService.getSession(username));
   }
-  
-  @PostMapping("/sessions/{sessionIdToDelete}")
-	public ResponseEntity<String> removeSession(String username, @PathVariable String sessionIdToDelete) {
-		concurrencyService.removeSession(username, sessionIdToDelete);
-    return ResponseEntity.status(HttpStatus.OK).body("success");	
-	}
 
+  @PostMapping("/sessions/{sessionIdToDelete}")
+  public ResponseEntity<String> removeSession(
+      String username, @PathVariable String sessionIdToDelete) {
+    concurrencyService.removeSession(username, sessionIdToDelete);
+    return ResponseEntity.status(HttpStatus.OK).body("success");
+  }
 }
