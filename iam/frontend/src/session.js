@@ -1,19 +1,18 @@
-import React, { Component } from "react";
-import { Table, Space} from "antd";
+import React, { Component } from 'react'
+import { Table, Space } from 'antd'
 
 class Session extends Component {
-
   constructor() {
-    super();
+    super()
     this.state = {
       sessions: [],
-      firstname: "ALEX",
-      lastname: "",
+      firstname: 'ALEX',
+      lastname: '',
     }
   }
 
   componentDidMount() {
-    this.getSession();
+    this.getSession()
   }
 
   getSession() {
@@ -25,7 +24,7 @@ class Session extends Component {
     //         response.status);
     //       return;
     //     }
-  
+
     //     // Examine the text in the response
     //     response.json().then(function(data) {
     //       this.setState({
@@ -40,64 +39,63 @@ class Session extends Component {
     let data = [
       {
         key: 1,
-        firstname: "alex",
-        lastname: "tang",
+        firstname: 'alex',
+        lastname: 'tang',
         sessionId: 1,
       },
       {
         key: 2,
-        firstname: "alex1",
-        lastname: "tang",
+        firstname: 'alex1',
+        lastname: 'tang',
         sessionId: 1,
       },
       {
         key: 3,
-        firstname: "alex2",
-        lastname: "tang2",
+        firstname: 'alex2',
+        lastname: 'tang2',
         sessionId: 1,
-      }
+      },
     ]
     this.setState({
-      sessions: data
+      sessions: data,
     })
-    this.getName();
+    this.getName()
   }
 
   getName() {
     this.setState({
-      firstname: "Alice",
-      lastname: "Tang"
+      firstname: 'Alice',
+      lastname: 'Tang',
     })
   }
-
 
   handleSessionDelete() {
     // delete session
   }
 
   render() {
-    let { sessions, firstname, lastname } = this.state;
+    let { sessions, firstname, lastname } = this.state
     let columns = [
       {
-        title: "First Name",
-        dataIndex: "firstname",
-        key: "firstname",
+        title: 'First Name',
+        dataIndex: 'firstname',
+        key: 'firstname',
       },
       {
-        title: "Last Name",
-        dataIndex: "lastname",
-        key: "lastname",
+        title: 'Last Name',
+        dataIndex: 'lastname',
+        key: 'lastname',
       },
       {
-        title: "Session ID",
-        dataIndex: "sessionId",
-        key: "sessionId",
-      }
-    ];
+        title: 'Session ID',
+        dataIndex: 'sessionId',
+        key: 'sessionId',
+      },
+    ]
 
     return (
       <div className="session">
-        <h1>Hello, {firstname + " " + lastname}</h1>
+        <h1>Hello, {firstname + ' ' + lastname}</h1>
         <Table dataSource={sessions}>
           <Table.ColumnGroup title="Name">
             <Table.Column title="First Name" dataIndex="firstname" key="firstname" />
@@ -115,8 +113,8 @@ class Session extends Component {
           />
         </Table>
       </div>
-    );
+    )
   }
 }
 
-export default Session;
+export default Session
