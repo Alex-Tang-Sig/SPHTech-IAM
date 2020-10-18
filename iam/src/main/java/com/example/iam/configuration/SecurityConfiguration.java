@@ -76,7 +76,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     http.csrf()
         .disable() // for postman api test
         .authorizeRequests()
-        .antMatchers("/signup", "/login", "/login/email", "/user")
+        .antMatchers("/signup", "/login", "/login/email", "/user", "/test/cookie")
         .permitAll()
         .anyRequest()
         .authenticated();
@@ -86,7 +86,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     http.logout()
         .permitAll()
         .invalidateHttpSession(true)
-        .deleteCookies("JSESSIONID")
+        .deleteCookies("SESSION")
         .logoutSuccessHandler(logoutSuccessHandler());
 
     http.addFilterBefore(
