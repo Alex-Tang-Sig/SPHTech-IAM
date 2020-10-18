@@ -91,4 +91,20 @@ public class User implements CustomUserDetails {
     final SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("USER");
     return Collections.singletonList(simpleGrantedAuthority);
   }
+
+  @Override
+  public int hashCode() {
+    return id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (!(o instanceof User)) {
+      return false;
+    }
+    return o.hashCode() == id;
+  }
 }

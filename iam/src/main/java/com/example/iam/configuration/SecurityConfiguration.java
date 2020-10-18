@@ -4,6 +4,9 @@ import com.example.iam.user.CustomDaoAuthenticationProvider;
 import com.example.iam.user.EmailPasswordAuthenticationFilter;
 import com.example.iam.user.UserService;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +34,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
@@ -78,22 +86,30 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/signup", "/login", "/login/email", "/user")
         .permitAll()
         .anyRequest()
-        .authenticated();
-
-    http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
+        .authenticated()
+        .and()
+        .formLogin()
+        .permitAll();
 
     http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler());
 
+    http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
+
     http.addFilterBefore(
         usernamePasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
+
     http.addFilterBefore(
         emailPasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
+  }
 
-    http.sessionManagement()
-        .maximumSessions(10)
-        .maxSessionsPreventsLogin(false) // (2)
-        .expiredUrl("/login")
-        .sessionRegistry(sessionRegistry());
+  @Bean
+  public HttpSessionEventPublisher httpSessionEventPublisher() {
+    return new HttpSessionEventPublisher();
+  }
+
+  @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
   }
 
   @Override
@@ -127,6 +143,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
     filter.setAuthenticationFailureHandler(authenticationFailureHandler);
     filter.setFilterProcessesUrl("/login/email");
+    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
     return filter;
   }
 
@@ -137,6 +154,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     filter.setAuthenticationDetailsSource(authenticationDetailsSource);
     filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
     filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
     filter.setFilterProcessesUrl("/login");
     return filter;
   }
@@ -187,6 +205,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     return new CustomAuthenticationEntryPoint();
   }
 
+  @Bean
+  public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+    List<SessionAuthenticationStrategy> delegateStrategies = new ArrayList<>();
+    ChangeSessionIdAuthenticationStrategy changeSessionIdAuthenticationStrategy =
+        new ChangeSessionIdAuthenticationStrategy();
+    ConcurrentSessionControlAuthenticationStrategy concurrentSessionControlStrategy =
+        new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry());
+    RegisterSessionAuthenticationStrategy registerSessionStrategy =
+        new RegisterSessionAuthenticationStrategy(sessionRegistry());
+    delegateStrategies.addAll(
+        Arrays.asList(
+            concurrentSessionControlStrategy,
+            changeSessionIdAuthenticationStrategy,
+            registerSessionStrategy));
+    return new CompositeSessionAuthenticationStrategy(delegateStrategies);
+  }
+
   private class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(
@@ -196,15 +231,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         throws IOException, ServletException {
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
-  }
-
-  @Bean
-  public HttpSessionEventPublisher httpSessionEventPublisher() {
-    return new HttpSessionEventPublisher();
-  }
-
-  @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
   }
 }
