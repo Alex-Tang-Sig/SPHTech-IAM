@@ -20,6 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -30,6 +31,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
@@ -46,8 +48,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Autowired private SavedRequestAwareAuthenticationSuccessHandler authenticationSuccessHandler;
 
   @Autowired private AuthenticationFailureHandler authenticationFailureHandler;
-
-  @Autowired SessionRegistryImpl sessionRegistryImpl;
 
   @Autowired
   private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails>
@@ -90,10 +90,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         emailPasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
 
     http.sessionManagement()
-        .sessionFixation()
-        .migrateSession()
-        .maximumSessions(-1)
-        .sessionRegistry(sessionRegistryImpl);
+        .maximumSessions(10)
+        .maxSessionsPreventsLogin(false) // (2)
+        .expiredUrl("/login")
+        .sessionRegistry(sessionRegistry());
   }
 
   @Override
@@ -196,5 +196,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         throws IOException, ServletException {
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
+  }
+
+  @Bean
+  public HttpSessionEventPublisher httpSessionEventPublisher() {
+    return new HttpSessionEventPublisher();
+  }
+
+  @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
   }
 }
