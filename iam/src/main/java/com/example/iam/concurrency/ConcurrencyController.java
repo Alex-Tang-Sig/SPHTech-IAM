@@ -1,33 +1,22 @@
 package com.example.iam.concurrency;
 
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ConcurrencyController {
 
-  @RequestMapping("/test/cookie")
-  public String cookie(
-      @RequestParam("browser") String browser, HttpServletRequest request, HttpSession session) {
-    // 取出 session 中的 browser
-    Object sessionBrowser = session.getAttribute("browser");
-    if (sessionBrowser == null) {
-      System.out.println("不存在 session，设置 browser=" + browser);
-      session.setAttribute("browser", browser);
-    } else {
-      System.out.println("存在 session，browser=" + sessionBrowser.toString());
-    }
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null && cookies.length > 0) {
-      for (Cookie cookie : cookies) {
-        System.out.println(cookie.getName() + ":" + cookie.getValue());
-      }
-    }
-    return "index";
+  @Autowired ConcurrencyService concurrencyService;
+
+  @GetMapping("/sessions")
+  public ResponseEntity<List<SessionInformation>> sessions(Authentication authentication) {
+    List<SessionInformation> list = concurrencyService.getAllSessions(authentication);
+    return ResponseEntity.status(HttpStatus.OK).body(list);
   }
 }

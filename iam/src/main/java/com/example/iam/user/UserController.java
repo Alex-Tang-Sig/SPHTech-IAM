@@ -1,9 +1,7 @@
 package com.example.iam.user;
 
 import java.util.List;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,27 +22,12 @@ public class UserController {
 
   @PostMapping(value = "/signup")
   public ResponseEntity<String> signup(
-      @RequestParam("username") String username,
+      @RequestParam(value = "username", required = false) String username,
+      @RequestParam(value = "email", required = false) String email,
       @RequestParam("password") String password,
-      @RequestParam("email") String email,
-      @RequestParam("browser") String browser,
-      HttpServletRequest request,
-      HttpSession session) {
-
-    Object sessionBrowser = session.getAttribute("browser");
-    if (sessionBrowser == null) {
-      System.out.println("不存在 session，设置 browser=" + browser);
-      session.setAttribute("browser", browser);
-    } else {
-      System.out.println("存在 session，browser=" + sessionBrowser.toString());
-    }
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null && cookies.length > 0) {
-      for (Cookie cookie : cookies) {
-        System.out.println(cookie.getName() + ":" + cookie.getValue());
-      }
-    }
-
+      HttpServletRequest request) {
+    if (username == null && email == null)
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No username or email");
     User user = new User();
     user.setUsername(username);
     user.setPassword(password);

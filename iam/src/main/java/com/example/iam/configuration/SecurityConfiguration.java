@@ -7,7 +7,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -21,9 +20,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -48,7 +47,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Autowired private AuthenticationFailureHandler authenticationFailureHandler;
 
-  @Autowired private AuthenticationEntryPoint authenticationEntryPoint;
+  @Autowired SessionRegistryImpl sessionRegistryImpl;
 
   @Autowired
   private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails>
@@ -76,23 +75,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     http.csrf()
         .disable() // for postman api test
         .authorizeRequests()
-        .antMatchers("/signup", "/login", "/login/email", "/user", "/test/cookie")
+        .antMatchers("/signup", "/login", "/login/email", "/user")
         .permitAll()
         .anyRequest()
         .authenticated();
 
     http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
 
-    http.logout()
-        .permitAll()
-        .invalidateHttpSession(true)
-        .deleteCookies("SESSION")
-        .logoutSuccessHandler(logoutSuccessHandler());
+    http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler());
 
     http.addFilterBefore(
         usernamePasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
     http.addFilterBefore(
         emailPasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
+
+    http.sessionManagement()
+        .sessionFixation()
+        .migrateSession()
+        .maximumSessions(-1)
+        .sessionRegistry(sessionRegistryImpl);
   }
 
   @Override
@@ -161,10 +162,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       public void onAuthenticationSuccess(
           HttpServletRequest request, HttpServletResponse response, Authentication authentication)
           throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-          session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-        }
         response.setStatus(HttpServletResponse.SC_OK);
       }
     };
