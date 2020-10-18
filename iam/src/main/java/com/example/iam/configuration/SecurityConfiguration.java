@@ -86,11 +86,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/signup", "/login", "/login/email", "/user")
         .permitAll()
         .anyRequest()
-        .authenticated()
-        .and()
-        .formLogin()
-        .permitAll();
-
+        .authenticated();
     http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler());
 
     http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
@@ -212,6 +208,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         new ChangeSessionIdAuthenticationStrategy();
     ConcurrentSessionControlAuthenticationStrategy concurrentSessionControlStrategy =
         new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry());
+    concurrentSessionControlStrategy.setMaximumSessions(-1);
     RegisterSessionAuthenticationStrategy registerSessionStrategy =
         new RegisterSessionAuthenticationStrategy(sessionRegistry());
     delegateStrategies.addAll(
