@@ -33,7 +33,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
@@ -80,22 +79,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.csrf()
-        .disable() // for postman api test
-        .authorizeRequests()
-        .antMatchers("/signup", "/login", "/login/email", "/user")
+    http.csrf().disable(); // for postman api test
+
+    http.authorizeRequests()
+        .antMatchers("/signup", "/login/**", "/user", "/auth/**", "/oauth2/**")
         .permitAll()
         .anyRequest()
         .authenticated();
-    http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler());
 
     http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
 
-    http.addFilterBefore(
-        usernamePasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
+    http.logout().permitAll().logoutSuccessHandler(logoutSuccessHandler());
+
+    http.addFilter(usernamePasswordAuthenticationFilter());
 
     http.addFilterBefore(
-        emailPasswordAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
+        emailPasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
   }
 
   @Bean
