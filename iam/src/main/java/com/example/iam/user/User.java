@@ -13,7 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User implements CustomUserDetails {
 
   private static final long serialVersionUID = -5605924596779014029L;
