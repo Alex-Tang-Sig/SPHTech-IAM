@@ -2,11 +2,15 @@ package com.example.iam.oauth2;
 
 import com.example.iam.oauth2.config.AppProperties;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import java.security.SignatureException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,8 +54,6 @@ public class TokenProvider {
           .setSigningKey(appProperties.getAuth().getTokenSecret())
           .parseClaimsJws(authToken);
       return true;
-    } catch (SignatureException ex) {
-      logger.error("Invalid JWT signature");
     } catch (MalformedJwtException ex) {
       logger.error("Invalid JWT token");
     } catch (ExpiredJwtException ex) {
