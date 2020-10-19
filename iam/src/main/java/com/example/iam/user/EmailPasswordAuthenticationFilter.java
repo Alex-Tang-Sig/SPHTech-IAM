@@ -20,7 +20,7 @@ public class EmailPasswordAuthenticationFilter extends AbstractAuthenticationPro
   private boolean postOnly = true;
 
   public EmailPasswordAuthenticationFilter() {
-    super(new AntPathRequestMatcher("/emaillogin", "POST"));
+    super(new AntPathRequestMatcher("/login/email", "POST"));
   }
 
   public Authentication attemptAuthentication(
