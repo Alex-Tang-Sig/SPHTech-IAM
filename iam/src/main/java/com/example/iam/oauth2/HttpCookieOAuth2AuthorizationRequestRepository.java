@@ -1,6 +1,6 @@
 package com.example.iam.oauth2;
 
-import com.example.iam.util.CookieUtils;
+import com.example.iam.oauth2.util.CookieUtils;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

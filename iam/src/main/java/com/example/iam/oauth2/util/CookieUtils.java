@@ -1,4 +1,4 @@
-package com.example.iam.util;
+package com.example.iam.oauth2.util;
 
 import java.util.Base64;
 import java.util.Optional;

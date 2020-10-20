@@ -2,7 +2,7 @@ package com.example.iam.oauth2;
 
 import static com.example.iam.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
-import com.example.iam.util.CookieUtils;
+import com.example.iam.oauth2.util.CookieUtils;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;

@@ -4,7 +4,7 @@ import static com.example.iam.oauth2.HttpCookieOAuth2AuthorizationRequestReposit
 
 import com.example.iam.oauth2.config.AppProperties;
 import com.example.iam.oauth2.exception.BadRequestException;
-import com.example.iam.util.CookieUtils;
+import com.example.iam.oauth2.util.CookieUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
